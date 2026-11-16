@@ -292,13 +292,18 @@ var CONFIG = {
   function modoDemo() { return CONFIG.API_URL.indexOf('COLE_AQUI') >= 0; }
 
   /* ---------- Busca de dados ---------- */
+  var pedidoAtual = 0;
   function carregar(forcar) {
-    if (estado.carregando) return;
+    // Atualização automática não atropela uma busca em andamento;
+    // já uma ação da pessoa (filtro, botão) sempre vale e descarta a resposta antiga.
+    if (estado.carregando && !forcar) return;
+    var meuPedido = ++pedidoAtual;
     estado.carregando = true;
     $('btnAtualizar').className = 'girando';
     setStatus('carregando', 'atualizando…');
 
     var ok = function (d) {
+      if (meuPedido !== pedidoAtual) return;
       estado.carregando = false;
       $('btnAtualizar').className = '';
       if (!d || !d.ok) { erro((d && d.erro) || 'resposta inválida'); return; }
@@ -308,6 +313,7 @@ var CONFIG = {
       setStatus('ok', 'atualizado às ' + d.atualizadoEm.substr(0, 5) + (modoDemo() ? ' (demonstração)' : ''));
     };
     var erro = function (msg) {
+      if (meuPedido !== pedidoAtual) return;
       estado.carregando = false;
       $('btnAtualizar').className = '';
       setStatus('erro', 'falha: ' + msg + ' — tentando de novo');
@@ -330,7 +336,7 @@ var CONFIG = {
 
   function agendar() {
     if (timerDados) clearInterval(timerDados);
-    timerDados = setInterval(carregar, CONFIG.ATUALIZAR_SEG * 1000);
+    timerDados = setInterval(function () { carregar(false); }, CONFIG.ATUALIZAR_SEG * 1000);
   }
 
   /* ---------- Desenho ---------- */
