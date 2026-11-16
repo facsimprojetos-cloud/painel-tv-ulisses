@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Apontador de Produção</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:500,700|Roboto:400,500,700&display=swap">
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+  body { font-family: Roboto, Arial, Helvetica, sans-serif; color: #fff; }
+  /* Palco fixo 1920x1080, escalado para caber em qualquer tela */
+  #palco { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: #000;
+    -webkit-transform-origin: 0 0; -ms-transform-origin: 0 0; transform-origin: 0 0; overflow: hidden; }
+  .abs { position: absolute; }
+  .amarelo { color: #e8dc3c; }
+
+  /* Caixas douradas (estilo Looker) */
+  .caixa { position: absolute; border: 3px solid #b3a632; border-radius: 12px;
+    box-shadow: inset 0 0 0 2px #000, inset 0 0 0 4px #5e5717;
+    background: #1c1c1c;
+    background: -webkit-linear-gradient(top, #2e2e2e, #0c0c0c);
+    background: linear-gradient(to bottom, #2e2e2e, #0c0c0c); }
+
+  /* Cabeçalho */
+  #logo1 { left: 22px; top: 2px; width: 404px; }
+  #logo2 { left: 22px; top: 116px; width: 404px; }
+  #titulo { left: 470px; top: 0; width: 340px; text-align: center; font-family: Oswald, 'Arial Narrow', Arial, sans-serif;
+    font-style: italic; font-weight: 700; font-size: 74px; line-height: 88px; color: #e8dc3c; white-space: nowrap; }
+  #titulo span { display: inline-block; }
+  #status { left: 24px; top: 246px; width: 440px; font-size: 18px; color: #9d9440; white-space: nowrap; }
+  #status .ponto { display: inline-block; width: 12px; height: 12px; border-radius: 6px; background: #3dbb4a; margin-right: 6px; vertical-align: middle; }
+  #status .ponto.erro { background: #e53935; }
+  #status .ponto.carregando { background: #e8dc3c; }
+  #relogio { color: #e8dc3c; font-weight: 700; font-size: 22px; margin-right: 10px; }
+
+  /* Filtros */
+  .filtro { top: 6px; height: 60px; }
+  .filtro select { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 22px; }
+  .filtro .rot { position: absolute; left: 22px; right: 46px; top: 16px; font-size: 20px; color: #e6e0a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .filtro .seta { position: absolute; right: 18px; top: 26px; width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 8px solid #e6e0a0; }
+  #fPeriodo { left: 808px; width: 430px; }
+  #fPeriodo .meia { position: absolute; top: 0; height: 100%; width: 50%; }
+  #fPeriodo .meia select { font-size: 22px; }
+  #fOperador { left: 1270px; width: 324px; }
+  #fProcesso { left: 1636px; width: 270px; }
+  .filtro.ativo { border-color: #fff36b; }
+
+  /* KPIs */
+  .kpi .rot { position: absolute; left: 24px; top: 18px; font-size: 22px; color: #f0eccf; }
+  .kpi .val { position: absolute; right: 26px; bottom: 14px; font-size: 44px; color: #e8dc3c; white-space: nowrap; }
+  #kMeta { left: 808px; top: 128px; width: 238px; height: 104px; }
+  #kMeta .rot { top: 18px; }
+  #kMeta .val { bottom: 22px; }
+  #kReal { left: 1062px; top: 96px; width: 344px; height: 80px; }
+  #kProntas { left: 1062px; top: 186px; width: 344px; height: 80px; }
+  #kReal .val, #kProntas .val { bottom: 6px; }
+  #kSaldo { left: 1422px; top: 128px; width: 262px; height: 104px; }
+  #kSaldo .val { bottom: 22px; }
+  #kEf { left: 1700px; top: 128px; width: 206px; height: 104px; }
+  #kEf .val { right: 0; left: 0; text-align: center; bottom: 26px; font-size: 46px; }
+
+  /* Tabela de lançamentos */
+  #boxTab { left: 18px; top: 280px; width: 1504px; height: 786px; overflow: hidden; }
+  #boxOp { left: 1540px; top: 280px; width: 366px; height: 786px; overflow: hidden; }
+  table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+  th { background: #000; color: #e8dc3c; font-weight: 700; font-size: 23px; height: 46px; padding: 0 4px; text-align: center; white-space: nowrap; overflow: hidden; }
+  td { font-size: 20px; text-align: center; padding: 0 6px; height: 58px; line-height: 23px; border-top: 2px solid #000; overflow: hidden; color: #fff; }
+  #tabOp td { height: 39px; line-height: 39px; font-size: 21px; white-space: nowrap; text-overflow: ellipsis; }
+  #tabOp th { font-size: 24px; }
+  .cel2 { display: block; max-height: 46px; overflow: hidden; }
+  tr.r td { background: #b3191b; }
+  tr.a td { background: #3644a6; }
+  tr.v td { background: #2f8a35; }
+  tr.n td { background: #111; color: #e8dc3c; }
+  td.colsep { border-left: 1px solid rgba(0,0,0,.35); }
+  .pag { position: absolute; right: 12px; bottom: 6px; font-size: 16px; color: #9d9440; }
+  #vazio { display: none; position: absolute; left: 0; right: 0; top: 330px; text-align: center; font-size: 34px; color: #9d9440; }
+  #aviso { display: none; position: absolute; left: 470px; top: 1010px; width: 980px; padding: 10px; text-align: center;
+    background: #b3191b; color: #fff; font-size: 22px; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div id="palco">
+  <img id="logo1" class="abs" src="logo-cristiano.png" alt="">
+  <img id="logo2" class="abs" src="logo-gut.png" alt="">
+  <div id="titulo" class="abs"><span>APONTADOR</span><br><span>DE</span><br><span>PRODUÇÃO</span></div>
+  <div id="status" class="abs"><span id="relogio">--:--</span><span id="ponto" class="ponto carregando"></span><span id="statusTxt">carregando…</span></div>
+
+  <div id="fPeriodo" class="caixa filtro">
+    <div class="rot" id="rotPeriodo">Carregando…</div><div class="seta"></div>
+    <div class="meia" style="left:0"><select id="selDe" title="Data inicial"></select></div>
+    <div class="meia" style="left:50%"><select id="selAte" title="Data final"></select></div>
+  </div>
+  <div id="fOperador" class="caixa filtro"><div class="rot" id="rotOperador">Operador.</div><div class="seta"></div><select id="selOperador"></select></div>
+  <div id="fProcesso" class="caixa filtro"><div class="rot" id="rotProcesso">Processo.</div><div class="seta"></div><select id="selProcesso"></select></div>
+
+  <div id="kMeta" class="caixa kpi"><div class="rot">Meta</div><div class="val" id="vMeta">–</div></div>
+  <div id="kReal" class="caixa kpi"><div class="rot">Realizado</div><div class="val" id="vReal">–</div></div>
+  <div id="kProntas" class="caixa kpi"><div class="rot">Prontas</div><div class="val" id="vProntas">–</div></div>
+  <div id="kSaldo" class="caixa kpi"><div class="rot">Saldo</div><div class="val" id="vSaldo">–</div></div>
+  <div id="kEf" class="caixa kpi"><div class="val" id="vEf">–</div></div>
+
+  <div id="boxTab" class="caixa">
+    <table id="tab">
+      <colgroup>
+        <col style="width:150px"><col style="width:142px"><col style="width:142px"><col style="width:160px">
+        <col style="width:200px"><col style="width:132px"><col style="width:132px"><col style="width:132px">
+        <col style="width:150px"><col>
+      </colgroup>
+      <thead><tr><th>Data</th><th>Hora</th><th>PRODUTO</th><th>Operador.</th><th>Processo.</th><th>Início</th><th>Fim</th><th>Meta</th><th>Realizado</th><th>Eficiência</th></tr></thead>
+      <tbody id="corpoTab"></tbody>
+    </table>
+    <div id="vazio">Nenhum lançamento no período</div>
+    <div class="pag" id="pagTab"></div>
+  </div>
+
+  <div id="boxOp" class="caixa">
+    <table id="tabOp">
+      <colgroup><col style="width:56%"><col></colgroup>
+      <thead><tr><th>Operador.</th><th>Eficiência</th></tr></thead>
+      <tbody id="corpoOp"></tbody>
+    </table>
+    <div class="pag" id="pagOp"></div>
+  </div>
+
+  <div id="aviso"></div>
+</div>
+
+<script>
+/* ======================= CONFIGURAÇÃO ======================= */
+var CONFIG = {
+  API_URL: 'https://script.google.com/macros/s/AKfycbzMzk3SnZeESKq1RA5OktySpvJRkDG5E4OFK7Pf60wrRCjiJMTGMcPPb1aSupE32_qrCQ/exec',
+  TOKEN: 'ulisses-e6b4d1b0b15c',                       // mesma senha do Code.gs
+  ATUALIZAR_SEG: 60,       // de quanto em quanto tempo busca dados novos
+  PAGINA_SEG: 10,          // tempo de cada "página" da tabela
+  LINHAS_POR_PAGINA: 12,   // lançamentos por página
+  OPERADORES_POR_PAGINA: 17,
+  AZUL_A_PARTIR: 0.80,     // abaixo disso = vermelho
+  VERDE_A_PARTIR: 1.00,    // a partir disso = verde (entre os dois = azul)
+  RECARREGAR_PAGINA_HORAS: 6 // recarrega a página inteira de tempos em tempos (TV antiga vaza memória)
+};
+/* ============================================================ */
+
+(function () {
+  'use strict';
+  var MESES = ['jan.', 'fev.', 'mar.', 'abr.', 'mai.', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
+  var estado = { de: '', ate: '', operador: '', processo: '', dados: null, pagTab: 0, pagOp: 0, carregando: false };
+  var timerDados = null;
+
+  function $(id) { return document.getElementById(id); }
+
+  /* ---------- Escala do palco ---------- */
+  function ajustarTela() {
+    var w = window.innerWidth || document.documentElement.clientWidth;
+    var h = window.innerHeight || document.documentElement.clientHeight;
+    var s = Math.min(w / 1920, h / 1080);
+    var p = $('palco');
+    var t = 'scale(' + s + ')';
+    p.style.webkitTransform = t; p.style.msTransform = t; p.style.transform = t;
+    p.style.left = Math.round((w - 1920 * s) / 2) + 'px';
+    p.style.top = Math.round((h - 1080 * s) / 2) + 'px';
+  }
+
+  /* ---------- Formatação pt-BR (sem depender de toLocaleString) ---------- */
+  function milhar(n) {
+    if (n === null || n === undefined || n === '') return '-';
+    var neg = n < 0, s = String(Math.round(Math.abs(n)));
+    var out = '';
+    while (s.length > 3) { out = '.' + s.substr(s.length - 3) + out; s = s.substr(0, s.length - 3); }
+    return (neg ? '-' : '') + s + out;
+  }
+  function pct(f) {
+    if (f === null || f === undefined) return '-';
+    var v = Math.round(f * 10000) / 100;
+    var s = v.toFixed(2).replace(/\.?0+$/, '');
+    return s.replace('.', ',') + '%';
+  }
+  function dataLonga(d) {
+    if (!d) return '';
+    var p = d.split('/');
+    return Number(p[0]) + ' de ' + MESES[Number(p[1]) - 1] + ' de ' + p[2];
+  }
+  function esc(s) {
+    return String(s === null || s === undefined ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function classe(ef) {
+    if (ef === null || ef === undefined) return 'n';
+    if (ef >= CONFIG.VERDE_A_PARTIR) return 'v';
+    if (ef >= CONFIG.AZUL_A_PARTIR) return 'a';
+    return 'r';
+  }
+  function dois(n) { return (n < 10 ? '0' : '') + n; }
+
+  /* ---------- JSONP (funciona em navegador de TV antiga, sem CORS) ---------- */
+  var seq = 0;
+  function jsonp(url, ok, falha) {
+    var nome = '__painelCb' + (++seq);
+    var head = document.getElementsByTagName('head')[0];
+    var s = document.createElement('script');
+    var feito = false;
+    var tempo = setTimeout(function () { fim(); falha('tempo esgotado'); }, 25000);
+    function fim() {
+      if (feito) return; feito = true;
+      clearTimeout(tempo);
+      window[nome] = function () {};
+      if (s.parentNode) s.parentNode.removeChild(s);
+    }
+    window[nome] = function (d) { if (feito) return; fim(); ok(d); };
+    s.onerror = function () { if (feito) return; fim(); falha('sem conexão'); };
+    s.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + nome + '&_=' + new Date().getTime();
+    head.appendChild(s);
+  }
+
+  function montarUrl() {
+    var q = ['token=' + encodeURIComponent(CONFIG.TOKEN)];
+    if (estado.de) q.push('de=' + encodeURIComponent(estado.de));
+    if (estado.ate) q.push('ate=' + encodeURIComponent(estado.ate));
+    if (estado.operador) q.push('operador=' + encodeURIComponent(estado.operador));
+    if (estado.processo) q.push('processo=' + encodeURIComponent(estado.processo));
+    return CONFIG.API_URL + '?' + q.join('&');
+  }
+
+  function modoDemo() { return CONFIG.API_URL.indexOf('COLE_AQUI') >= 0; }
+
+  /* ---------- Busca de dados ---------- */
+  function carregar() {
+    if (estado.carregando) return;
+    estado.carregando = true;
+    setStatus('carregando', 'atualizando…');
+
+    var ok = function (d) {
+      estado.carregando = false;
+      if (!d || !d.ok) { erro((d && d.erro) || 'resposta inválida'); return; }
+      estado.dados = d;
+      esconderAviso();
+      desenharTudo();
+      setStatus('ok', 'atualizado às ' + d.atualizadoEm.substr(0, 5) + (modoDemo() ? ' (demonstração)' : ''));
+    };
+    var erro = function (msg) {
+      estado.carregando = false;
+      setStatus('erro', 'falha: ' + msg + ' — tentando de novo');
+      if (!estado.dados) mostrarAviso('Não foi possível carregar os dados (' + msg + '). Tentando novamente…');
+    };
+
+    if (modoDemo()) {
+      if (window.DEMO_DADOS) { setTimeout(function () { ok(window.DEMO_DADOS); }, 50); }
+      else {
+        var s = document.createElement('script');
+        s.src = 'demo.js';
+        s.onload = function () { ok(window.DEMO_DADOS); };
+        s.onerror = function () { erro('configure API_URL no index.html'); };
+        document.getElementsByTagName('head')[0].appendChild(s);
+      }
+      return;
+    }
+    jsonp(montarUrl(), ok, erro);
+  }
+
+  function agendar() {
+    if (timerDados) clearInterval(timerDados);
+    timerDados = setInterval(carregar, CONFIG.ATUALIZAR_SEG * 1000);
+  }
+
+  /* ---------- Desenho ---------- */
+  function desenharTudo() {
+    var d = estado.dados;
+    var t = d.totais;
+    $('vMeta').innerHTML = milhar(t.meta);
+    $('vReal').innerHTML = milhar(t.realizado);
+    $('vProntas').innerHTML = milhar(t.prontas);
+    $('vSaldo').innerHTML = milhar(t.saldo);
+    $('vEf').innerHTML = pct(t.eficiencia);
+
+    $('rotPeriodo').innerHTML = esc(dataLonga(d.de) + ' - ' + dataLonga(d.ate));
+    $('rotOperador').innerHTML = esc(estado.operador || 'Operador.');
+    $('rotProcesso').innerHTML = esc(estado.processo || 'Processo.');
+    $('fOperador').className = 'caixa filtro' + (estado.operador ? ' ativo' : '');
+    $('fProcesso').className = 'caixa filtro' + (estado.processo ? ' ativo' : '');
+
+    preencherFiltros(d);
+    corrigirPaginas();
+    desenharTabela();
+    desenharOperadores();
+  }
+
+  function totalPaginas(n, porPag) { return Math.max(1, Math.ceil(n / porPag)); }
+
+  function corrigirPaginas() {
+    var d = estado.dados;
+    if (estado.pagTab >= totalPaginas(d.linhas.length, CONFIG.LINHAS_POR_PAGINA)) estado.pagTab = 0;
+    if (estado.pagOp >= totalPaginas(d.porOperador.length, CONFIG.OPERADORES_POR_PAGINA)) estado.pagOp = 0;
+  }
+
+  function desenharTabela() {
+    var linhas = estado.dados.linhas;
+    var porPag = CONFIG.LINHAS_POR_PAGINA;
+    var tp = totalPaginas(linhas.length, porPag);
+    var ini = estado.pagTab * porPag;
+    var html = [];
+    for (var i = ini; i < Math.min(ini + porPag, linhas.length); i++) {
+      var l = linhas[i];
+      html.push(
+        '<tr class="' + classe(l.eficiencia) + '">' +
+        '<td><span class="cel2">' + esc(dataLonga(l.data)) + '</span></td>' +
+        '<td class="colsep">' + esc(l.hora) + '</td>' +
+        '<td class="colsep">' + esc(l.produto) + '</td>' +
+        '<td class="colsep"><span class="cel2">' + esc(l.operador) + '</span></td>' +
+        '<td class="colsep"><span class="cel2">' + esc(l.processo) + '</span></td>' +
+        '<td class="colsep">' + esc(l.inicio || '-') + '</td>' +
+        '<td class="colsep">' + esc(l.fim || '-') + '</td>' +
+        '<td class="colsep">' + (l.meta === null ? '-' : milhar(l.meta)) + '</td>' +
+        '<td class="colsep">' + milhar(l.realizado) + '</td>' +
+        '<td class="colsep">' + pct(l.eficiencia) + '</td>' +
+        '</tr>'
+      );
+    }
+    $('corpoTab').innerHTML = html.join('');
+    $('vazio').style.display = linhas.length ? 'none' : 'block';
+    var extra = estado.dados.totalLinhas > linhas.length ? ' (mostrando ' + linhas.length + ' de ' + estado.dados.totalLinhas + ')' : '';
+    $('pagTab').innerHTML = tp > 1 || extra ? 'página ' + (estado.pagTab + 1) + ' de ' + tp + extra : '';
+  }
+
+  function desenharOperadores() {
+    var ops = estado.dados.porOperador;
+    var porPag = CONFIG.OPERADORES_POR_PAGINA;
+    var tp = totalPaginas(ops.length, porPag);
+    var ini = estado.pagOp * porPag;
+    var html = [];
+    for (var i = ini; i < Math.min(ini + porPag, ops.length); i++) {
+      var o = ops[i];
+      html.push('<tr class="' + classe(o.eficiencia) + '"><td>' + esc(o.operador) + '</td><td class="colsep">' + pct(o.eficiencia) + '</td></tr>');
+    }
+    $('corpoOp').innerHTML = html.join('');
+    $('pagOp').innerHTML = tp > 1 ? (estado.pagOp + 1) + '/' + tp : '';
+  }
+
+  function virarPagina() {
+    if (!estado.dados) return;
+    var d = estado.dados;
+    var tpT = totalPaginas(d.linhas.length, CONFIG.LINHAS_POR_PAGINA);
+    var tpO = totalPaginas(d.porOperador.length, CONFIG.OPERADORES_POR_PAGINA);
+    if (tpT > 1) { estado.pagTab = (estado.pagTab + 1) % tpT; desenharTabela(); }
+    if (tpO > 1) { estado.pagOp = (estado.pagOp + 1) % tpO; desenharOperadores(); }
+  }
+
+  /* ---------- Filtros (funcionam com o controle remoto: setas + OK) ---------- */
+  function opcoes(sel, lista, valorAtual, rotuloVazio, rotular) {
+    var html = ['<option value="">' + esc(rotuloVazio) + '</option>'];
+    var achou = false;
+    for (var i = 0; i < lista.length; i++) {
+      var v = lista[i];
+      if (v === valorAtual) achou = true;
+      html.push('<option value="' + esc(v) + '"' + (v === valorAtual ? ' selected' : '') + '>' + esc(rotular ? rotular(v) : v) + '</option>');
+    }
+    if (valorAtual && !achou) html.splice(1, 0, '<option value="' + esc(valorAtual) + '" selected>' + esc(rotular ? rotular(valorAtual) : valorAtual) + '</option>');
+    var chave = html.join('');
+    if (sel.getAttribute('data-k') !== chave) { sel.innerHTML = chave; sel.setAttribute('data-k', chave); }
+    sel.value = valorAtual || '';
+  }
+
+  function preencherFiltros(d) {
+    opcoes($('selDe'), d.datas, estado.de, 'Início: hoje (automático)', function (x) { return 'Início: ' + dataLonga(x); });
+    opcoes($('selAte'), d.datas, estado.ate, 'Fim: igual ao início', function (x) { return 'Fim: ' + dataLonga(x); });
+    opcoes($('selOperador'), d.operadores, estado.operador, 'Todos os operadores');
+    opcoes($('selProcesso'), d.processos, estado.processo, 'Todos os processos');
+  }
+
+  function aoMudarFiltro(campo, valor) {
+    estado[campo] = valor;
+    if (campo === 'de' && !valor) estado.ate = '';
+    estado.pagTab = 0; estado.pagOp = 0;
+    salvarFiltros();
+    if (modoDemo()) { desenharTudo(); return; }
+    carregar(); agendar();
+  }
+
+  function salvarFiltros() {
+    try {
+      window.localStorage.setItem('painelFiltros', JSON.stringify({
+        de: estado.de, ate: estado.ate, operador: estado.operador, processo: estado.processo
+      }));
+    } catch (e) {}
+  }
+
+  function lerFiltros() {
+    // 1) parâmetros na URL têm prioridade: ?de=13/11/2026&ate=16/11/2026&operador=Sara&processo=Barra
+    var q = window.location.search.replace(/^\?/, '').split('&');
+    var temUrl = false;
+    for (var i = 0; i < q.length; i++) {
+      var kv = q[i].split('=');
+      var k = decodeURIComponent(kv[0] || '');
+      var v = decodeURIComponent((kv[1] || '').replace(/\+/g, ' '));
+      if (k === 'de' || k === 'ate' || k === 'operador' || k === 'processo') { estado[k] = v; temUrl = true; }
+    }
+    if (temUrl) return;
+    // 2) senão, o último filtro escolhido na própria TV
+    try {
+      var s = JSON.parse(window.localStorage.getItem('painelFiltros') || 'null');
+      if (s) { estado.de = s.de || ''; estado.ate = s.ate || ''; estado.operador = s.operador || ''; estado.processo = s.processo || ''; }
+    } catch (e) {}
+  }
+
+  function ligarFiltros() {
+    $('selDe').onchange = function () { aoMudarFiltro('de', this.value); };
+    $('selAte').onchange = function () { aoMudarFiltro('ate', this.value); };
+    $('selOperador').onchange = function () { aoMudarFiltro('operador', this.value); };
+    $('selProcesso').onchange = function () { aoMudarFiltro('processo', this.value); };
+  }
+
+  /* ---------- Status / relógio ---------- */
+  function setStatus(tipo, txt) {
+    $('ponto').className = 'ponto' + (tipo === 'erro' ? ' erro' : (tipo === 'carregando' ? ' carregando' : ''));
+    $('statusTxt').innerHTML = esc(txt);
+  }
+  function mostrarAviso(t) { var a = $('aviso'); a.innerHTML = esc(t); a.style.display = 'block'; }
+  function esconderAviso() { $('aviso').style.display = 'none'; }
+
+  var ultimoDia = '';
+  function tick() {
+    var n = new Date();
+    $('relogio').innerHTML = dois(n.getDate()) + '/' + dois(n.getMonth() + 1) + ' ' + dois(n.getHours()) + ':' + dois(n.getMinutes());
+    // Virou o dia com filtro automático: busca o novo dia
+    var dia = n.getDate();
+    if (ultimoDia !== '' && dia !== ultimoDia && !estado.de && !modoDemo()) carregar();
+    ultimoDia = dia;
+  }
+
+  /* Ajusta o tamanho do título para caber, qualquer que seja a fonte da TV */
+  function ajustarTitulo() {
+    var t = $('titulo'), spans = t.getElementsByTagName('span'), tam = 80;
+    t.style.fontSize = tam + 'px';
+    var maior = 0;
+    for (var i = 0; i < spans.length; i++) maior = Math.max(maior, spans[i].offsetWidth);
+    if (maior > 330) { tam = Math.floor(tam * 330 / maior); t.style.fontSize = tam + 'px'; }
+  }
+
+  /* ---------- Início ---------- */
+  function iniciar() {
+    ajustarTela();
+    window.onresize = ajustarTela;
+    ajustarTitulo();
+    setTimeout(ajustarTitulo, 1500); // de novo depois que a fonte Oswald carregar
+    setTimeout(ajustarTitulo, 5000);
+    lerFiltros();
+    ligarFiltros();
+    tick();
+    setInterval(tick, 15000);
+    carregar();
+    agendar();
+    setInterval(virarPagina, CONFIG.PAGINA_SEG * 1000);
+    if (CONFIG.RECARREGAR_PAGINA_HORAS > 0) {
+      setTimeout(function () { window.location.reload(); }, CONFIG.RECARREGAR_PAGINA_HORAS * 3600 * 1000);
+    }
+  }
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') iniciar();
+  else if (document.addEventListener) document.addEventListener('DOMContentLoaded', iniciar, false);
+  else window.onload = iniciar;
+})();
+</script>
+</body>
+</html>
