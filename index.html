@@ -25,23 +25,67 @@
   /* Cabeçalho */
   #logo1 { left: 22px; top: 2px; width: 404px; }
   #logo2 { left: 22px; top: 116px; width: 404px; }
-  #titulo { left: 470px; top: 0; width: 340px; text-align: center; font-family: Oswald, 'Arial Narrow', Arial, sans-serif;
-    font-style: italic; font-weight: 700; font-size: 74px; line-height: 88px; color: #e8dc3c; white-space: nowrap; }
+  #titulo { left: 448px; top: 4px; width: 340px; text-align: center; font-family: Oswald, 'Arial Narrow', Arial, sans-serif;
+    font-style: italic; font-weight: 700; font-size: 70px; line-height: 84px; color: #e8dc3c; white-space: nowrap; }
   #titulo span { display: inline-block; }
-  #status { left: 24px; top: 246px; width: 440px; font-size: 18px; color: #9d9440; white-space: nowrap; }
+  #status { left: 66px; top: 249px; width: 400px; font-size: 18px; color: #9d9440; white-space: nowrap; }
   #status .ponto { display: inline-block; width: 12px; height: 12px; border-radius: 6px; background: #3dbb4a; margin-right: 6px; vertical-align: middle; }
   #status .ponto.erro { background: #e53935; }
   #status .ponto.carregando { background: #e8dc3c; }
   #relogio { color: #e8dc3c; font-weight: 700; font-size: 22px; margin-right: 10px; }
+
+  #btnAtualizar { position: absolute; left: 22px; top: 243px; width: 36px; height: 36px; padding: 0; margin: 0;
+    border: 2px solid #b3a632; border-radius: 8px; background: #1c1c1c; cursor: pointer; outline: none; }
+  #btnAtualizar:focus, #btnAtualizar:hover { border-color: #fff36b; background: #2a2a2a; }
+  #btnAtualizar svg { display: block; width: 22px; height: 22px; margin: 5px; }
+  #btnAtualizar.girando svg { -webkit-animation: gira 0.9s linear infinite; animation: gira 0.9s linear infinite; }
+  @-webkit-keyframes gira { from { -webkit-transform: rotate(0deg); } to { -webkit-transform: rotate(360deg); } }
+  @keyframes gira { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
   /* Filtros */
   .filtro { top: 6px; height: 60px; }
   .filtro select { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 22px; }
   .filtro .rot { position: absolute; left: 22px; right: 46px; top: 16px; font-size: 20px; color: #e6e0a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .filtro .seta { position: absolute; right: 18px; top: 26px; width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 8px solid #e6e0a0; }
-  #fPeriodo { left: 808px; width: 430px; }
-  #fPeriodo .meia { position: absolute; top: 0; height: 100%; width: 50%; }
-  #fPeriodo .meia select { font-size: 22px; }
+  #fPeriodo { left: 808px; width: 430px; cursor: pointer; outline: none; }
+  #fPeriodo:focus { border-color: #fff36b; }
+
+  /* Calendário */
+  #calFundo { display: none; position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; z-index: 40; background: rgba(0,0,0,.45); }
+  #cal { display: none; position: absolute; left: 808px; top: 74px; width: 930px; z-index: 50; padding: 18px 22px 20px;
+    background: #121212; border: 3px solid #b3a632; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.85); color: #eee; }
+  #cal button { font-family: Roboto, Arial, sans-serif; font-size: 18px; color: #e6e0a0; background: #1f1f1f; border: 2px solid #5e5717;
+    border-radius: 8px; padding: 7px 14px; margin: 0 8px 8px 0; cursor: pointer; outline: none; }
+  #cal button:hover, #cal button:focus { border-color: #fff36b; color: #fff; }
+  #cal button.principal { background: #e8dc3c; color: #000; border-color: #e8dc3c; font-weight: 700; }
+  #cal button.principal[disabled] { background: #444; border-color: #444; color: #888; cursor: default; }
+  #cal .atalhos { margin-bottom: 8px; }
+  #cal .meses { white-space: nowrap; }
+  #cal .mes { display: inline-block; vertical-align: top; width: 440px; margin-right: 18px; white-space: normal; }
+  #cal .mes:last-child { margin-right: 0; }
+  #cal .cab { position: relative; height: 44px; text-align: center; font-size: 23px; font-weight: 700; color: #e8dc3c; line-height: 44px; }
+  #cal .cab button { position: absolute; top: 0; margin: 0; padding: 4px 14px; font-size: 22px; line-height: 30px; }
+  #cal .cab .ant { left: 0; } #cal .cab .prox { right: 0; }
+  #cal table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 2px; }
+  #cal th { background: transparent; color: #9d9440; font-size: 17px; height: 30px; font-weight: 500; }
+  #cal td { height: 44px; line-height: 44px; padding: 0; border: 0; font-size: 20px; background: transparent; color: #ddd;
+    text-align: center; border-radius: 6px; cursor: pointer; }
+  #cal td.vazio { cursor: default; }
+  #cal td.futuro { color: #4a4a4a; cursor: default; }
+  #cal td.dados { color: #fff; font-weight: 700; }
+  #cal td.dados span { border-bottom: 3px solid #e8dc3c; padding-bottom: 1px; }
+  #cal td.hojec { box-shadow: inset 0 0 0 2px #9d9440; }
+  #cal td.faixa { background: #4d471a; color: #fff; }
+  #cal td.sel { background: #e8dc3c; color: #000; }
+  #cal td.sel span { border-bottom-color: #000; }
+  #cal td.dia:hover { box-shadow: inset 0 0 0 2px #fff36b; }
+  #cal .rodape { margin-top: 12px; border-top: 1px solid #333; padding-top: 14px; position: relative; height: 44px; }
+  #cal .resumo { position: absolute; left: 0; top: 22px; font-size: 20px; color: #f0eccf; }
+  #cal .resumo b { color: #e8dc3c; }
+  #cal .resumo .erro { color: #ff6b6b; }
+  #cal .botoes { position: absolute; right: 0; top: 12px; }
+  #cal .botoes button { margin: 0 0 0 10px; }
+  #cal .dica { font-size: 16px; color: #8a8450; margin-top: 2px; }
   #fOperador { left: 1270px; width: 324px; }
   #fProcesso { left: 1636px; width: 270px; }
   .filtro.ativo { border-color: #fff36b; }
@@ -66,8 +110,18 @@
   table { border-collapse: collapse; width: 100%; table-layout: fixed; }
   th { background: #000; color: #e8dc3c; font-weight: 700; font-size: 23px; height: 46px; padding: 0 4px; text-align: center; white-space: nowrap; overflow: hidden; }
   td { font-size: 20px; text-align: center; padding: 0 6px; height: 58px; line-height: 23px; border-top: 2px solid #000; overflow: hidden; color: #fff; }
-  #tabOp td { height: 39px; line-height: 39px; font-size: 21px; white-space: nowrap; text-overflow: ellipsis; }
-  #tabOp th { font-size: 24px; }
+  .tabOp td { height: 39px; line-height: 39px; font-size: 21px; white-space: nowrap; text-overflow: ellipsis; }
+  .tabOp th { font-size: 24px; }
+  /* Áreas com rolagem: o cabeçalho fica fixo e o corpo rola */
+  .cabFixo { position: absolute; left: 0; right: 14px; top: 0; height: 46px; overflow: hidden; }
+  .rolagem { position: absolute; left: 0; right: 0; top: 46px; bottom: 26px; overflow-x: hidden; overflow-y: auto;
+    -webkit-overflow-scrolling: touch; }
+  .rolagem::-webkit-scrollbar { width: 14px; }
+  .rolagem::-webkit-scrollbar-track { background: #111; }
+  .rolagem::-webkit-scrollbar-thumb { background: #8c8227; border-radius: 7px; border: 2px solid #111; }
+  .rolagem::-webkit-scrollbar-thumb:hover { background: #e8dc3c; }
+  .rolagem { scrollbar-color: #8c8227 #111; scrollbar-width: auto; }
+  .pag.pausado { color: #e8dc3c; }
   .cel2 { display: block; max-height: 46px; overflow: hidden; }
   tr.r td { background: #b3191b; }
   tr.a td { background: #3644a6; }
@@ -75,7 +129,7 @@
   tr.n td { background: #111; color: #e8dc3c; }
   td.colsep { border-left: 1px solid rgba(0,0,0,.35); }
   .pag { position: absolute; right: 12px; bottom: 6px; font-size: 16px; color: #9d9440; }
-  #vazio { display: none; position: absolute; left: 0; right: 0; top: 330px; text-align: center; font-size: 34px; color: #9d9440; }
+  #vazio { display: none; position: absolute; left: 0; right: 0; top: 330px; z-index: 2; text-align: center; font-size: 34px; color: #9d9440; }
   #aviso { display: none; position: absolute; left: 470px; top: 1010px; width: 980px; padding: 10px; text-align: center;
     background: #b3191b; color: #fff; font-size: 22px; border-radius: 8px; }
 </style>
@@ -85,12 +139,11 @@
   <img id="logo1" class="abs" src="logo-cristiano.png" alt="">
   <img id="logo2" class="abs" src="logo-gut.png" alt="">
   <div id="titulo" class="abs"><span>APONTADOR</span><br><span>DE</span><br><span>PRODUÇÃO</span></div>
+  <button id="btnAtualizar" title="Atualizar agora" aria-label="Atualizar agora"><svg viewBox="0 0 24 24"><path fill="none" stroke="#e8dc3c" stroke-width="2.6" stroke-linecap="round" d="M20 12a8 8 0 1 1-2.6-5.9"/><path fill="#e8dc3c" d="M21.5 3.2v6.6h-6.6z"/></svg></button>
   <div id="status" class="abs"><span id="relogio">--:--</span><span id="ponto" class="ponto carregando"></span><span id="statusTxt">carregando…</span></div>
 
-  <div id="fPeriodo" class="caixa filtro">
+  <div id="fPeriodo" class="caixa filtro" tabindex="0" role="button" title="Escolher período">
     <div class="rot" id="rotPeriodo">Carregando…</div><div class="seta"></div>
-    <div class="meia" style="left:0"><select id="selDe" title="Data inicial"></select></div>
-    <div class="meia" style="left:50%"><select id="selAte" title="Data final"></select></div>
   </div>
   <div id="fOperador" class="caixa filtro"><div class="rot" id="rotOperador">Operador.</div><div class="seta"></div><select id="selOperador"></select></div>
   <div id="fProcesso" class="caixa filtro"><div class="rot" id="rotProcesso">Processo.</div><div class="seta"></div><select id="selProcesso"></select></div>
@@ -102,29 +155,41 @@
   <div id="kEf" class="caixa kpi"><div class="val" id="vEf">–</div></div>
 
   <div id="boxTab" class="caixa">
-    <table id="tab">
+    <div class="cabFixo"><table>
       <colgroup>
         <col style="width:150px"><col style="width:142px"><col style="width:142px"><col style="width:160px">
         <col style="width:200px"><col style="width:132px"><col style="width:132px"><col style="width:132px">
         <col style="width:150px"><col>
       </colgroup>
       <thead><tr><th>Data</th><th>Hora</th><th>PRODUTO</th><th>Operador.</th><th>Processo.</th><th>Início</th><th>Fim</th><th>Meta</th><th>Realizado</th><th>Eficiência</th></tr></thead>
+    </table></div>
+    <div class="rolagem" id="rolaTab"><table id="tab">
+      <colgroup>
+        <col style="width:150px"><col style="width:142px"><col style="width:142px"><col style="width:160px">
+        <col style="width:200px"><col style="width:132px"><col style="width:132px"><col style="width:132px">
+        <col style="width:150px"><col>
+      </colgroup>
       <tbody id="corpoTab"></tbody>
-    </table>
+    </table></div>
     <div id="vazio">Nenhum lançamento no período</div>
     <div class="pag" id="pagTab"></div>
   </div>
 
   <div id="boxOp" class="caixa">
-    <table id="tabOp">
+    <div class="cabFixo"><table class="tabOp">
       <colgroup><col style="width:56%"><col></colgroup>
       <thead><tr><th>Operador.</th><th>Eficiência</th></tr></thead>
+    </table></div>
+    <div class="rolagem" id="rolaOp"><table id="tabOp" class="tabOp">
+      <colgroup><col style="width:56%"><col></colgroup>
       <tbody id="corpoOp"></tbody>
-    </table>
+    </table></div>
     <div class="pag" id="pagOp"></div>
   </div>
 
   <div id="aviso"></div>
+  <div id="calFundo"></div>
+  <div id="cal"></div>
 </div>
 
 <script>
@@ -133,9 +198,8 @@ var CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbzMzk3SnZeESKq1RA5OktySpvJRkDG5E4OFK7Pf60wrRCjiJMTGMcPPb1aSupE32_qrCQ/exec',
   TOKEN: 'ulisses-e6b4d1b0b15c',                       // mesma senha do Code.gs
   ATUALIZAR_SEG: 60,       // de quanto em quanto tempo busca dados novos
-  PAGINA_SEG: 10,          // tempo de cada "página" da tabela
-  LINHAS_POR_PAGINA: 12,   // lançamentos por página
-  OPERADORES_POR_PAGINA: 17,
+  PAGINA_SEG: 10,          // de quanto em quanto tempo a lista de operadores rola sozinha
+  PAUSA_AO_MEXER_SEG: 90,  // depois que alguém rola/clica, a troca automática de página espera esse tempo
   AZUL_A_PARTIR: 0.80,     // abaixo disso = vermelho
   VERDE_A_PARTIR: 1.00,    // a partir disso = verde (entre os dois = azul)
   RECARREGAR_PAGINA_HORAS: 6 // recarrega a página inteira de tempos em tempos (TV antiga vaza memória)
@@ -144,8 +208,10 @@ var CONFIG = {
 
 (function () {
   'use strict';
+  var MESES_LONGOS = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  var MAX_DIAS = 62;
   var MESES = ['jan.', 'fev.', 'mar.', 'abr.', 'mai.', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
-  var estado = { de: '', ate: '', operador: '', processo: '', dados: null, pagTab: 0, pagOp: 0, carregando: false };
+  var estado = { de: '', ate: '', operador: '', processo: '', dados: null, carregando: false };
   var timerDados = null;
 
   function $(id) { return document.getElementById(id); }
@@ -213,8 +279,9 @@ var CONFIG = {
     head.appendChild(s);
   }
 
-  function montarUrl() {
+  function montarUrl(forcar) {
     var q = ['token=' + encodeURIComponent(CONFIG.TOKEN)];
+    if (forcar) q.push('nocache=1');
     if (estado.de) q.push('de=' + encodeURIComponent(estado.de));
     if (estado.ate) q.push('ate=' + encodeURIComponent(estado.ate));
     if (estado.operador) q.push('operador=' + encodeURIComponent(estado.operador));
@@ -225,13 +292,15 @@ var CONFIG = {
   function modoDemo() { return CONFIG.API_URL.indexOf('COLE_AQUI') >= 0; }
 
   /* ---------- Busca de dados ---------- */
-  function carregar() {
+  function carregar(forcar) {
     if (estado.carregando) return;
     estado.carregando = true;
+    $('btnAtualizar').className = 'girando';
     setStatus('carregando', 'atualizando…');
 
     var ok = function (d) {
       estado.carregando = false;
+      $('btnAtualizar').className = '';
       if (!d || !d.ok) { erro((d && d.erro) || 'resposta inválida'); return; }
       estado.dados = d;
       esconderAviso();
@@ -240,6 +309,7 @@ var CONFIG = {
     };
     var erro = function (msg) {
       estado.carregando = false;
+      $('btnAtualizar').className = '';
       setStatus('erro', 'falha: ' + msg + ' — tentando de novo');
       if (!estado.dados) mostrarAviso('Não foi possível carregar os dados (' + msg + '). Tentando novamente…');
     };
@@ -255,7 +325,7 @@ var CONFIG = {
       }
       return;
     }
-    jsonp(montarUrl(), ok, erro);
+    jsonp(montarUrl(forcar), ok, erro);
   }
 
   function agendar() {
@@ -285,21 +355,38 @@ var CONFIG = {
     desenharOperadores();
   }
 
-  function totalPaginas(n, porPag) { return Math.max(1, Math.ceil(n / porPag)); }
+  /* ---------- Rolagem: automática (TV) + manual (barra de rolagem / mouse / toque) ---------- */
+  var pausaAte = 0;
+  function pausarAuto() { pausaAte = new Date().getTime() + CONFIG.PAUSA_AO_MEXER_SEG * 1000; atualizarIndicadores(); }
+  function pausado() { return new Date().getTime() < pausaAte; }
 
-  function corrigirPaginas() {
-    var d = estado.dados;
-    if (estado.pagTab >= totalPaginas(d.linhas.length, CONFIG.LINHAS_POR_PAGINA)) estado.pagTab = 0;
-    if (estado.pagOp >= totalPaginas(d.porOperador.length, CONFIG.OPERADORES_POR_PAGINA)) estado.pagOp = 0;
+  function infoPag(el) {
+    var vis = el.clientHeight || 1;
+    var tot = Math.max(1, Math.ceil((el.scrollHeight - 2) / vis));
+    var at = Math.min(tot, Math.floor((el.scrollTop + 2) / vis) + 1);
+    if (el.scrollTop + vis >= el.scrollHeight - 2) at = tot;
+    return { atual: at, total: tot };
   }
+
+  function atualizarIndicadores() {
+    if (!estado.dados) return;
+    var p = infoPag($('rolaTab')), q = infoPag($('rolaOp'));
+    var d = estado.dados;
+    var txt = d.linhas.length ? 'lançamentos mais recentes primeiro' : '';
+    if (d.totalLinhas > d.linhas.length) txt = 'últimos ' + d.linhas.length + ' de ' + d.totalLinhas + ' lançamentos do período';
+    if (p.total > 1 && $('rolaTab').scrollTop > 2) txt += ' · role para cima para ver os mais recentes';
+    $('pagTab').innerHTML = txt;
+    $('pagTab').className = 'pag';
+    $('pagOp').innerHTML = q.total > 1 ? q.atual + '/' + q.total : '';
+  }
+
+  function corrigirPaginas() {}
+  function voltarAoTopo() { $('rolaTab').scrollTop = 0; $('rolaOp').scrollTop = 0; }
 
   function desenharTabela() {
     var linhas = estado.dados.linhas;
-    var porPag = CONFIG.LINHAS_POR_PAGINA;
-    var tp = totalPaginas(linhas.length, porPag);
-    var ini = estado.pagTab * porPag;
     var html = [];
-    for (var i = ini; i < Math.min(ini + porPag, linhas.length); i++) {
+    for (var i = 0; i < linhas.length; i++) {
       var l = linhas[i];
       html.push(
         '<tr class="' + classe(l.eficiencia) + '">' +
@@ -316,33 +403,51 @@ var CONFIG = {
         '</tr>'
       );
     }
+    var r = $('rolaTab'), pos = r.scrollTop;
     $('corpoTab').innerHTML = html.join('');
+    r.scrollTop = pos; // mantém onde a pessoa estava ao atualizar os dados
     $('vazio').style.display = linhas.length ? 'none' : 'block';
-    var extra = estado.dados.totalLinhas > linhas.length ? ' (mostrando ' + linhas.length + ' de ' + estado.dados.totalLinhas + ')' : '';
-    $('pagTab').innerHTML = tp > 1 || extra ? 'página ' + (estado.pagTab + 1) + ' de ' + tp + extra : '';
+    atualizarIndicadores();
   }
 
   function desenharOperadores() {
     var ops = estado.dados.porOperador;
-    var porPag = CONFIG.OPERADORES_POR_PAGINA;
-    var tp = totalPaginas(ops.length, porPag);
-    var ini = estado.pagOp * porPag;
     var html = [];
-    for (var i = ini; i < Math.min(ini + porPag, ops.length); i++) {
+    for (var i = 0; i < ops.length; i++) {
       var o = ops[i];
       html.push('<tr class="' + classe(o.eficiencia) + '"><td>' + esc(o.operador) + '</td><td class="colsep">' + pct(o.eficiencia) + '</td></tr>');
     }
+    var r = $('rolaOp'), pos = r.scrollTop;
     $('corpoOp').innerHTML = html.join('');
-    $('pagOp').innerHTML = tp > 1 ? (estado.pagOp + 1) + '/' + tp : '';
+    r.scrollTop = pos;
+    atualizarIndicadores();
+  }
+
+  function avancar(el) {
+    var vis = el.clientHeight;
+    if (el.scrollHeight <= vis + 2) return;
+    if (el.scrollTop + vis >= el.scrollHeight - 2) el.scrollTop = 0;
+    else el.scrollTop = el.scrollTop + vis;
   }
 
   function virarPagina() {
-    if (!estado.dados) return;
-    var d = estado.dados;
-    var tpT = totalPaginas(d.linhas.length, CONFIG.LINHAS_POR_PAGINA);
-    var tpO = totalPaginas(d.porOperador.length, CONFIG.OPERADORES_POR_PAGINA);
-    if (tpT > 1) { estado.pagTab = (estado.pagTab + 1) % tpT; desenharTabela(); }
-    if (tpO > 1) { estado.pagOp = (estado.pagOp + 1) % tpO; desenharOperadores(); }
+    if (!estado.dados || pausado() || cal.aberto) { atualizarIndicadores(); return; }
+    // Lançamentos: ficam parados nos mais recentes (volta ao topo depois que alguém rolou)
+    $('rolaTab').scrollTop = 0;
+    // Acumulado por operador: rola sozinho para baixo e volta ao topo
+    avancar($('rolaOp'));
+    atualizarIndicadores();
+  }
+
+  function ligarRolagem() {
+    var areas = [$('rolaTab'), $('rolaOp')];
+    var evs = ['wheel', 'mousewheel', 'DOMMouseScroll', 'mousedown', 'touchstart', 'keydown'];
+    for (var i = 0; i < areas.length; i++) {
+      for (var j = 0; j < evs.length; j++) {
+        if (areas[i].addEventListener) areas[i].addEventListener(evs[j], pausarAuto, false);
+      }
+      areas[i].onscroll = function () { atualizarIndicadores(); };
+    }
   }
 
   /* ---------- Filtros (funcionam com o controle remoto: setas + OK) ---------- */
@@ -361,19 +466,167 @@ var CONFIG = {
   }
 
   function preencherFiltros(d) {
-    opcoes($('selDe'), d.datas, estado.de, 'Início: hoje (automático)', function (x) { return 'Início: ' + dataLonga(x); });
-    opcoes($('selAte'), d.datas, estado.ate, 'Fim: igual ao início', function (x) { return 'Fim: ' + dataLonga(x); });
     opcoes($('selOperador'), d.operadores, estado.operador, 'Todos os operadores');
     opcoes($('selProcesso'), d.processos, estado.processo, 'Todos os processos');
   }
 
   function aoMudarFiltro(campo, valor) {
     estado[campo] = valor;
-    if (campo === 'de' && !valor) estado.ate = '';
-    estado.pagTab = 0; estado.pagOp = 0;
+    voltarAoTopo();
     salvarFiltros();
     if (modoDemo()) { desenharTudo(); return; }
-    carregar(); agendar();
+    carregar(true); agendar();
+  }
+
+  /* ---------- Calendário (período livre: data inicial + data final) ---------- */
+  var cal = { aberto: false, base: null, ini: null, fim: null };
+
+  function parseD(s) { var p = s.split('/'); return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0])); }
+  function fmtD(d) { return dois(d.getDate()) + '/' + dois(d.getMonth() + 1) + '/' + d.getFullYear(); }
+  function hojeD() { var n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+  function somaDias(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function difDias(a, b) { return Math.round((b.getTime() - a.getTime()) / 86400000); }
+  function mesmoDia(a, b) { return a && b && a.getTime() === b.getTime(); }
+
+  function abrirCal() {
+    var d = estado.dados;
+    var de = estado.de || (d && d.de) || fmtD(hojeD());
+    var ate = estado.ate || (estado.de ? de : ((d && d.ate) || de));
+    cal.ini = parseD(de); cal.fim = parseD(ate);
+    cal.base = new Date(cal.fim.getFullYear(), cal.fim.getMonth(), 1);
+    cal.aberto = true;
+    desenharCal();
+    $('calFundo').style.display = 'block';
+    $('cal').style.display = 'block';
+  }
+
+  function fecharCal() {
+    cal.aberto = false;
+    $('calFundo').style.display = 'none';
+    $('cal').style.display = 'none';
+    try { $('fPeriodo').focus(); } catch (e) {}
+  }
+
+  function htmlMes(primeiro, temDados) {
+    var hoje = hojeD();
+    var ano = primeiro.getFullYear(), mes = primeiro.getMonth();
+    var diasNoMes = new Date(ano, mes + 1, 0).getDate();
+    var h = ['<div class="mes"><div class="cab">' + MESES_LONGOS[mes] + ' ' + ano + '</div><table><thead><tr>'];
+    var sem = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+    for (var i = 0; i < 7; i++) h.push('<th>' + sem[i] + '</th>');
+    h.push('</tr></thead><tbody><tr>');
+    var col = primeiro.getDay();
+    for (i = 0; i < col; i++) h.push('<td class="vazio"></td>');
+    var fim = cal.fim || cal.ini;
+    for (var dia = 1; dia <= diasNoMes; dia++) {
+      var d = new Date(ano, mes, dia), s = fmtD(d), cls = [];
+      if (d.getTime() > hoje.getTime()) cls.push('futuro'); else cls.push('dia');
+      if (temDados[s]) cls.push('dados');
+      if (mesmoDia(d, hoje)) cls.push('hojec');
+      if (mesmoDia(d, cal.ini) || mesmoDia(d, fim)) cls.push('sel');
+      else if (cal.ini && fim && d > cal.ini && d < fim) cls.push('faixa');
+      h.push('<td class="' + cls.join(' ') + '"' + (cls[0] === 'dia' ? ' data-d="' + s + '"' : '') + '><span>' + dia + '</span></td>');
+      col++;
+      if (col === 7 && dia < diasNoMes) { h.push('</tr><tr>'); col = 0; }
+    }
+    while (col > 0 && col < 7) { h.push('<td class="vazio"></td>'); col++; }
+    h.push('</tr></tbody></table></div>');
+    return h.join('');
+  }
+
+  function desenharCal() {
+    var temDados = {};
+    var lista = (estado.dados && estado.dados.datas) || [];
+    for (var i = 0; i < lista.length; i++) temDados[lista[i]] = true;
+    var esq = new Date(cal.base.getFullYear(), cal.base.getMonth() - 1, 1);
+    var hoje = hojeD();
+    var podeAvancar = new Date(cal.base.getFullYear(), cal.base.getMonth() + 1, 1) <= hoje;
+
+    var fim = cal.fim || cal.ini;
+    var dias = difDias(cal.ini, fim) + 1;
+    var resumo;
+    if (!cal.fim) resumo = 'Início: <b>' + fmtD(cal.ini) + '</b> &nbsp;—&nbsp; agora clique na <b>data final</b>';
+    else resumo = 'De <b>' + fmtD(cal.ini) + '</b> até <b>' + fmtD(cal.fim) + '</b> &nbsp;(' + dias + (dias === 1 ? ' dia' : ' dias') + ')';
+    var invalido = dias > MAX_DIAS;
+    if (invalido) resumo += ' &nbsp;<span class="erro">máximo ' + MAX_DIAS + ' dias</span>';
+
+    $('cal').innerHTML =
+      '<div class="atalhos">' +
+        '<button data-acao="hoje">Hoje (automático)</button>' +
+        '<button data-acao="ontem">Ontem</button>' +
+        '<button data-acao="7">Últimos 7 dias</button>' +
+        '<button data-acao="30">Últimos 30 dias</button>' +
+        '<button data-acao="mes">Este mês</button>' +
+        '<button data-acao="mespassado">Mês passado</button>' +
+      '</div>' +
+      '<div class="meses" style="position:relative">' +
+        htmlMes(esq, temDados) + htmlMes(cal.base, temDados) +
+        '<div class="cab" style="position:absolute;left:0;top:0;width:100%;height:0">' +
+          '<button class="ant" data-acao="ant" title="Mês anterior">&#8249;</button>' +
+          (podeAvancar ? '<button class="prox" data-acao="prox" title="Próximo mês">&#8250;</button>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="dica">Clique na data inicial e depois na data final. Dias sublinhados têm lançamentos.</div>' +
+      '<div class="rodape"><div class="resumo">' + resumo + '</div>' +
+        '<div class="botoes"><button data-acao="cancelar">Cancelar</button>' +
+        '<button class="principal" data-acao="aplicar"' + (invalido ? ' disabled' : '') + '>Aplicar</button></div></div>';
+  }
+
+  function aplicarPeriodo(de, ate) {
+    estado.de = de; estado.ate = ate;
+    voltarAoTopo();
+    salvarFiltros();
+    fecharCal();
+    if (modoDemo()) { desenharTudo(); return; }
+    carregar(true); agendar();
+  }
+
+  function cliqueCal(ev) {
+    ev = ev || window.event;
+    var t = ev.target || ev.srcElement;
+    while (t && t.id !== 'cal' && !(t.getAttribute && (t.getAttribute('data-acao') || t.getAttribute('data-d')))) t = t.parentNode;
+    if (!t || t.id === 'cal') return;
+    var dStr = t.getAttribute('data-d');
+    var hoje = hojeD();
+    if (dStr) {
+      var d = parseD(dStr);
+      if (!cal.ini || cal.fim) { cal.ini = d; cal.fim = null; }
+      else if (d < cal.ini) { cal.fim = cal.ini; cal.ini = d; }
+      else cal.fim = d;
+      desenharCal();
+      return;
+    }
+    var a = t.getAttribute('data-acao');
+    if (a === 'ant') { cal.base = new Date(cal.base.getFullYear(), cal.base.getMonth() - 1, 1); desenharCal(); }
+    else if (a === 'prox') { cal.base = new Date(cal.base.getFullYear(), cal.base.getMonth() + 1, 1); desenharCal(); }
+    else if (a === 'cancelar') fecharCal();
+    else if (a === 'aplicar') {
+      if (t.disabled) return;
+      var f = cal.fim || cal.ini;
+      aplicarPeriodo(fmtD(cal.ini), fmtD(f));
+    }
+    else if (a === 'hoje') aplicarPeriodo('', '');
+    else if (a === 'ontem') { var o = fmtD(somaDias(hoje, -1)); aplicarPeriodo(o, o); }
+    else if (a === '7') aplicarPeriodo(fmtD(somaDias(hoje, -6)), fmtD(hoje));
+    else if (a === '30') aplicarPeriodo(fmtD(somaDias(hoje, -29)), fmtD(hoje));
+    else if (a === 'mes') aplicarPeriodo(fmtD(new Date(hoje.getFullYear(), hoje.getMonth(), 1)), fmtD(hoje));
+    else if (a === 'mespassado') aplicarPeriodo(fmtD(new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1)), fmtD(new Date(hoje.getFullYear(), hoje.getMonth(), 0)));
+  }
+
+  function ligarCalendario() {
+    $('fPeriodo').onclick = abrirCal;
+    $('fPeriodo').onkeydown = function (ev) { ev = ev || window.event; var k = ev.keyCode; if (k === 13 || k === 32) { abrirCal(); return false; } };
+    $('cal').onclick = cliqueCal;
+    $('calFundo').onclick = fecharCal;
+    $('btnAtualizar').onclick = function () { carregar(true); agendar(); };
+    var anterior = document.onkeydown;
+    document.onkeydown = function (ev) {
+      ev = ev || window.event;
+      var k = ev.keyCode;
+      // Esc, e "Voltar" do controle (Samsung 10009, LG 461)
+      if (cal.aberto && (k === 27 || k === 10009 || k === 461)) { fecharCal(); return false; }
+      if (anterior) return anterior(ev);
+    };
   }
 
   function salvarFiltros() {
@@ -403,8 +656,6 @@ var CONFIG = {
   }
 
   function ligarFiltros() {
-    $('selDe').onchange = function () { aoMudarFiltro('de', this.value); };
-    $('selAte').onchange = function () { aoMudarFiltro('ate', this.value); };
     $('selOperador').onchange = function () { aoMudarFiltro('operador', this.value); };
     $('selProcesso').onchange = function () { aoMudarFiltro('processo', this.value); };
   }
@@ -429,11 +680,11 @@ var CONFIG = {
 
   /* Ajusta o tamanho do título para caber, qualquer que seja a fonte da TV */
   function ajustarTitulo() {
-    var t = $('titulo'), spans = t.getElementsByTagName('span'), tam = 80;
+    var t = $('titulo'), spans = t.getElementsByTagName('span'), tam = 76;
     t.style.fontSize = tam + 'px';
     var maior = 0;
     for (var i = 0; i < spans.length; i++) maior = Math.max(maior, spans[i].offsetWidth);
-    if (maior > 330) { tam = Math.floor(tam * 330 / maior); t.style.fontSize = tam + 'px'; }
+    if (maior > 296) { tam = Math.floor(tam * 296 / maior); t.style.fontSize = tam + 'px'; }
   }
 
   /* ---------- Início ---------- */
@@ -445,6 +696,8 @@ var CONFIG = {
     setTimeout(ajustarTitulo, 5000);
     lerFiltros();
     ligarFiltros();
+    ligarCalendario();
+    ligarRolagem();
     tick();
     setInterval(tick, 15000);
     carregar();
