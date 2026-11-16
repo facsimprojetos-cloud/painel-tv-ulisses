@@ -130,7 +130,7 @@
   td.colsep { border-left: 1px solid rgba(0,0,0,.35); }
   .pag { position: absolute; right: 12px; bottom: 6px; font-size: 16px; color: #9d9440; }
   #vazio { display: none; position: absolute; left: 0; right: 0; top: 330px; z-index: 2; text-align: center; font-size: 34px; color: #9d9440; }
-  #aviso { display: none; position: absolute; left: 470px; top: 1010px; width: 980px; padding: 10px; text-align: center;
+  #aviso { display: none; position: absolute; left: 300px; top: 940px; width: 1320px; padding: 12px; text-align: center; z-index: 30; word-wrap: break-word;
     background: #b3191b; color: #fff; font-size: 22px; border-radius: 8px; }
 </style>
 </head>
@@ -279,6 +279,42 @@ var CONFIG = {
     head.appendChild(s);
   }
 
+  /* ---------- Busca anônima (XHR sem cookies): funciona logado em qualquer conta Google ou sem conta ---------- */
+  function xhrJson(url, ok, falha) {
+    var x;
+    try { x = new XMLHttpRequest(); } catch (e) { falha('sem XHR'); return; }
+    if (!('withCredentials' in x)) { falha('navegador sem CORS'); return; }
+    var feito = false;
+    var tempo = setTimeout(function () { if (feito) return; feito = true; try { x.abort(); } catch (e) {} falha('tempo esgotado'); }, 25000);
+    x.onreadystatechange = function () {
+      if (x.readyState !== 4 || feito) return;
+      feito = true; clearTimeout(tempo);
+      if (x.status !== 200) { falha('HTTP ' + x.status); return; }
+      var d;
+      try { d = JSON.parse(x.responseText); } catch (e) { falha('resposta não é JSON'); return; }
+      ok(d);
+    };
+    try {
+      x.open('GET', url + '&_=' + new Date().getTime(), true);
+      x.withCredentials = false;
+      x.send(null);
+    } catch (e) { if (!feito) { feito = true; clearTimeout(tempo); falha('erro ao enviar: ' + e.message); } }
+  }
+
+  // Tenta o método anônimo; se o navegador não aceitar, cai para o JSONP.
+  var transporte = 'xhr';
+  function buscar(url, ok, falha) {
+    if (transporte === 'xhr') {
+      xhrJson(url, ok, function (motivo1) {
+        jsonp(url, function (d) { transporte = 'jsonp'; ok(d); }, function (motivo2) { falha(motivo1 + ' / ' + motivo2); });
+      });
+    } else {
+      jsonp(url, ok, function (motivo) {
+        xhrJson(url, function (d) { transporte = 'xhr'; ok(d); }, function (m2) { falha(motivo + ' / ' + m2); });
+      });
+    }
+  }
+
   function montarUrl(forcar) {
     var q = ['token=' + encodeURIComponent(CONFIG.TOKEN)];
     if (forcar) q.push('nocache=1');
@@ -317,7 +353,7 @@ var CONFIG = {
       estado.carregando = false;
       $('btnAtualizar').className = '';
       setStatus('erro', 'falha: ' + msg + ' — tentando de novo');
-      if (!estado.dados) mostrarAviso('Não foi possível carregar os dados (' + msg + '). Tentando novamente…');
+      if (!estado.dados) mostrarAviso('Não foi possível carregar os dados (' + msg + '). Tentando novamente…  |  ' + navigator.userAgent);
     };
 
     if (modoDemo()) {
@@ -331,7 +367,7 @@ var CONFIG = {
       }
       return;
     }
-    jsonp(montarUrl(forcar), ok, erro);
+    buscar(montarUrl(forcar), ok, erro);
   }
 
   function agendar() {
